@@ -1,22 +1,141 @@
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="push.min.js"></script>
-<script src="serviceWorker.min.js"></script>
-<script>
-function start(){
-	Push.create("Hello world!", {
-		body: "How's it hangin'?",
-		icon: 'https://img.freepik.com/free-vector/golden-bird-logo-design_1195-336.jpg?size=626&ext=jpg',
-		timeout: 4000,
-		onClick: function () {
-			window.focus();
-			this.close();
-		}
-	});
-}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="noti_styles.css">
+  <title>Working</title>
+</head>
+<body>
+  <div class="noti-container" id="noti-container"></div>
+  <a href="C:/Users/HP/Desktop/push/new/index.html" >Home</a>
+  <a href="example.com/5" target="_blank">About</a>
 
-function clear(){
-	Push.clear();
-}
-</script>
-<a href="javascript:void(0)" onclick="start()">Start</a>
-<a href="javascript:void(0)" onclick="clear()">Clear</a>
+  <script>
+  
+  
+  document.addEventListener('DOMContentLoaded', function () {
+      const notifications = [
+        { text1: 'Notification 1', text2: 'Here is my notification 1 Data', url: 'https://example.com/1' },
+        { text1: 'Notification 2', text2: 'Here is my notification 2 Data', url: 'https://example.com/2' }
+        // Add more notifications here
+      ];
+
+      let currentNotificationIndex = 0;
+
+      function showNotification(notification) {
+        const notiBox = document.createElement('div');
+        notiBox.className = 'noti-box';
+
+        notiBox.innerHTML = `
+          <div class="noti-logo">
+            <img src="https://cdn.pixabay.com/photo/2016/12/27/13/10/logo-1933884_640.png" alt="">
+          </div>
+          <div class="noti-right">
+            <div class="noti-text-1">${notification.text1}</div>
+            <div class="noti-text-2">${notification.text2}</div>
+          </div>
+          <i class="close-icon">&#x00D7;</i>
+        `;
+
+        const notiContainer = document.getElementById('noti-container');
+        notiContainer.appendChild(notiBox);
+
+        // Apply initial styles for fade-in
+        notiBox.style.opacity = '0';
+        notiBox.style.transform = 'translateX(100%)';
+        notiBox.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        
+        // Trigger reflow to apply the styles
+        notiBox.offsetHeight; // Trigger reflow
+
+        // Show notification
+        notiBox.style.opacity = '1';
+        notiBox.style.transform = 'translateX(0)';
+
+        // Handle click on notification to open link
+        notiBox.addEventListener('click', (event) => {
+          // Prevent clicks on close icon from triggering notification click
+          if (!event.target.classList.contains('close-icon')) {
+            window.open(notification.url, '_blank');
+          }
+        });
+
+        // Handle close button click
+        notiBox.querySelector('.close-icon').addEventListener('click', (event) => {
+          event.stopPropagation(); // Prevent triggering the notification click event
+          hideNotification(notiBox);
+        });
+
+        function hideNotification(box) {
+          box.style.opacity = '0';
+          box.style.transform = 'translateX(calc(100% + 35px))';
+          setTimeout(() => {
+            box.remove();
+            currentNotificationIndex++;
+            if (currentNotificationIndex < notifications.length) {
+              showNotification(notifications[currentNotificationIndex]);
+            }
+          }, 800); // Delay for hiding animation
+        }
+
+        setTimeout(() => {
+          hideNotification(notiBox);
+        }, 10000); // Show for 10 seconds
+
+        // --- OUTSIDE BOX LOGIC START ---
+        // Handle click outside the notification box
+        let clickOutsideHandled = false;
+
+        function handleClickOutside(event) {
+          if (!notiBox.contains(event.target) && !clickOutsideHandled) {
+            clickOutsideHandled = true;
+            // Store the time in local storage and open link after 60 seconds
+            storeDataInLocalStorageAndOpenLink();
+            setTimeout(() => {
+              const lastClickTime = localStorage.getItem('lastClickTime');
+              const lastClickOpen = localStorage.getItem('lastClickOpen');
+              
+              const now = Date.now();
+              if (now - lastClickTime >= 20000 && lastClickOpen == 0) { // 2 hours
+                openLink(notification.url);
+                localStorage.setItem('lastClickOpen',1);
+              }
+            }, 20000); // Wait 60 seconds before opening link
+          }
+        }
+
+        function storeDataInLocalStorageAndOpenLink() {
+          const lastClickTime = localStorage.getItem('lastClickTime');
+          const now = Date.now();
+          if (!lastClickTime || now - lastClickTime >= 7200000) { // 2 hours
+            localStorage.setItem('lastClickTime', now);
+            // Open the link after storing data
+            localStorage.setItem('lastClickOpen',0);
+          }
+        }
+
+        function openLink(url) {
+          // Listen for user clicks to bypass pop-up blockers
+          const clickHandler = (event) => {
+            if (!notiBox.contains(event.target)) {
+              window.open(url, '_blank');
+              document.removeEventListener('click', clickHandler);
+            }
+          };
+          document.addEventListener('click', clickHandler);
+        }
+
+        document.addEventListener('click', handleClickOutside);
+        // --- OUTSIDE BOX LOGIC END ---
+      }
+
+      // Start showing notifications
+      if (notifications.length > 0) {
+        showNotification(notifications[currentNotificationIndex]);
+      }
+    });
+   
+  </script>
+</body>
+</html>
