@@ -1,0 +1,78 @@
+body {
+  margin: 0;
+   overflow-x: hidden; /* Prevent horizontal scrollbar */
+    overflow-y: auto; 
+}
+
+.noti-container {
+  position: fixed; /* Fix position relative to viewport */
+  right: 16px;
+  bottom: 20px;
+  z-index: 9999; /* Ensure it is on top of other elements */
+}
+
+.noti-container .noti-box {
+  background: #403f3f;
+  display: flex;
+  align-items: center;
+  padding: 15px 65px 15px 15px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  opacity: 0; /* Start hidden */
+  transform: translateX(100%);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  cursor: pointer; /* Make the entire box clickable */
+  max-width: 350px; /* Set a maximum width to prevent overflow */
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Ensure long words break correctly */
+}
+
+.noti-box .noti-logo {
+  height: 90px;
+  width: 90px;
+  margin-right: 15px;
+}
+
+.noti-box .noti-logo img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.noti-box .noti-right {
+  display: flex;
+  flex-direction: column;
+  max-width: 200px; /* Adjust max width as needed */
+}
+
+.noti-box .noti-right .noti-text-1,
+.noti-box .noti-right .noti-text-2 {
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Ensure long words break correctly */
+  white-space: normal; /* Allow text to wrap */
+}
+
+.noti-box .noti-right .noti-text-1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.noti-box .noti-right .noti-text-2 {
+  font-size: 14px;
+  color: #fff;
+  margin: 2px 0 8px 0;
+}
+
+.noti-box .close-icon {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.noti-box .close-icon:hover {
+  color: #000;
+}
